@@ -1,0 +1,6 @@
+../Core/Src/CAN_Driver.c:12:6:CAN_Init	1
+../Core/Src/CAN_Driver.c:53:6:CAN_DeInit	1
+../Core/Src/CAN_Driver.c:60:19:CAN_SendMessage	1
+../Core/Src/CAN_Driver.c:84:19:CAN_ReceiveMessage	2
+../Core/Src/CAN_Driver.c:101:6:CAN_SendWakeMessage	2
+../Core/Src/CAN_Driver.c:124:6:CAN_ErrorCallback	1

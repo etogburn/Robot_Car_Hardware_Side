@@ -1,0 +1,10 @@
+../Core/Src/Motor_control.c:11:6:Motor_Init	1
+../Core/Src/Motor_control.c:37:6:Motor_SetSpeed	6
+../Core/Src/Motor_control.c:55:6:Motor_SetPwm	20
+../Core/Src/Motor_control.c:73:6:Motor_Stop	1
+../Core/Src/Motor_control.c:81:6:Motor_Calculate	26
+../Core/Src/Motor_control.c:191:6:Motor_Update	8
+../Core/Src/Motor_control.c:219:6:SetPhases	4
+../Core/Src/Motor_control.c:232:6:SetPhase	3
+../Core/Src/Motor_control.c:247:6:ReadHallSensors	1
+../Core/Src/Motor_control.c:254:6:CalculateHallTiming	5
