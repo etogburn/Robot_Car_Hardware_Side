@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "main.h"
-#include "serial_commands.h" // Include the SerialCommand_t definition
+#include "Coms_Handler.h"
 #include "drive_system.h"
 
 #define COMMAND_OK 0x00FF
@@ -21,7 +21,7 @@
 
 // Function prototypes
 void CommandHandler_Init(void);
-void CommandHandler_ProcessCommand(SerialCommand_t *command, DriveSystem *drive);
+void CommandHandler_ProcessCommand(ComsInterface_t *interface, DriveSystem *drive);
 
 
 #endif /* INC_COMMAND_HANDLER_H_ */

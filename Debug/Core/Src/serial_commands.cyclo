@@ -1,9 +1,0 @@
-../Core/Src/serial_commands.c:19:6:SerialCommands_Init	1
-../Core/Src/serial_commands.c:29:16:SerialCommands_IncrementIdx	2
-../Core/Src/serial_commands.c:37:24:SerialCommands_ProcessPacket	8
-../Core/Src/serial_commands.c:85:6:SerialCommands_HandleUARTInterrupt	1
-../Core/Src/serial_commands.c:95:6:SerialCommands_SetupRecieve	1
-../Core/Src/serial_commands.c:101:6:SerialCommands_Send	1
-../Core/Src/serial_commands.c:114:6:SerialCommands_BigSend	1
-../Core/Src/serial_commands.c:118:19:SerialCommands_GetCommand	2
-../Core/Src/serial_commands.c:128:6:SerialCommands_DoEvents	2

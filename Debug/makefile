@@ -60,8 +60,8 @@ all: main-build
 main-build: Robot_Car_Hardware_Side.elf secondary-outputs
 
 # Tool invocations
-Robot_Car_Hardware_Side.elf Robot_Car_Hardware_Side.map: $(OBJS) $(USER_OBJS) C:\Users\etogb\Code_Projects\Robot_Car_Hardware_Side\STM32G474QETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Robot_Car_Hardware_Side.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\etogb\Code_Projects\Robot_Car_Hardware_Side\STM32G474QETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Robot_Car_Hardware_Side.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Robot_Car_Hardware_Side.elf Robot_Car_Hardware_Side.map: $(OBJS) $(USER_OBJS) C:\Users\etogb\OneDrive\Documents\GitHub\Robot_Car_Hardware_Side\STM32G474QETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Robot_Car_Hardware_Side.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\etogb\OneDrive\Documents\GitHub\Robot_Car_Hardware_Side\STM32G474QETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Robot_Car_Hardware_Side.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
