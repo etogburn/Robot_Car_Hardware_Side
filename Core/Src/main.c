@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <motor_control.h>
 #include "main.h"
 #include "adc.h"
 #include "dac.h"
@@ -32,8 +33,7 @@
 #include "Coms_Handler.h"
 #include "IMU.h"
 #include "command_handler.h"
-#include "Motor_Control.h"
-#include "drive_system.h"
+#include "robot_system.h"
 
 /* USER CODE END Includes */
 
@@ -63,7 +63,7 @@ IMU_HandleTypeDef imu = {
 	    .int_pin = ACC_INT_Pin
 };
 
-DriveSystem drive = {
+RobotSystem robot = {
 		.Enable_Port = nWHEEL_MOTOR_SHDN_GPIO_Port,
 		.Enable_Pin = nWHEEL_MOTOR_SHDN_Pin,
 		.currentLimitDAC = &hdac2,
@@ -183,7 +183,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   IMU_Init(&imu);
-  DriveSystem_Init(&drive, leftWheel, rightWheel);
+  RobotSystem_Init(&robot, leftWheel, rightWheel);
   Comm_Init(&serial, COMM_UART, &huart2);
 
   /* USER CODE END 2 */
@@ -196,9 +196,9 @@ int main(void)
   {
 
 	  Comm_Process(&serial);
-	  DriveSystem_Calculate(&drive);
+	  RobotSystem_Calculate(&robot);
 
-	  CommandHandler_ProcessCommand(&serial, &drive);
+	  CommandHandler_ProcessCommand(&serial, &robot);
 
     /* USER CODE END WHILE */
 
@@ -256,7 +256,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-	DriveSystem_InterruptHandler(&drive, htim);
+	RobotSystem_InterruptHandler(&robot, htim);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)

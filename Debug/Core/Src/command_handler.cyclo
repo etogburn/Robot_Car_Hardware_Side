@@ -1,3 +1,8 @@
-../Core/Src/command_handler.c:13:13:SetResponse	1
-../Core/Src/command_handler.c:21:6:CommandHandler_Init	1
-../Core/Src/command_handler.c:27:6:CommandHandler_ProcessCommand	8
+../Core/Src/command_handler.c:20:13:SendResponse	1
+../Core/Src/command_handler.c:24:13:SetResponse	1
+../Core/Src/command_handler.c:32:16:makeInt16_t	1
+../Core/Src/command_handler.c:36:6:CommandHandler_Init	1
+../Core/Src/command_handler.c:41:6:CommandHandler_ProcessCommand	4
+../Core/Src/command_handler.c:60:6:Handle_SetMotorSpeed	2
+../Core/Src/command_handler.c:73:6:Handle_GetMotorPosition	1
+../Core/Src/command_handler.c:77:6:Handle_GetMotorSpeed	1

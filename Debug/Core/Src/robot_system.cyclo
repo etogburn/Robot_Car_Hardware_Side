@@ -1,0 +1,11 @@
+../Core/Src/robot_system.c:11:6:RobotSystem_Init	1
+../Core/Src/robot_system.c:28:6:RobotSystem_SetSpeed	1
+../Core/Src/robot_system.c:33:6:RobotSystem_SetLeftSpeed	1
+../Core/Src/robot_system.c:37:6:RobotSystem_SetRightSpeed	1
+../Core/Src/robot_system.c:42:6:RobotSystem_Stop	1
+../Core/Src/robot_system.c:47:6:RobotSystem_Calculate	1
+../Core/Src/robot_system.c:52:6:RobotSystem_InterruptHandler	3
+../Core/Src/robot_system.c:62:6:RobotSystem_Enable	1
+../Core/Src/robot_system.c:66:6:RobotSystem_Disable	1
+../Core/Src/robot_system.c:70:6:RobotSystem_SetEnablePin	2
+../Core/Src/robot_system.c:78:6:RobotSystem_SetCurrentLimit	2
