@@ -26,7 +26,7 @@
 typedef struct {
     Motor leftWheel;  // Left wheel motor
     Motor rightWheel; // Right wheel motor
-    GPIO_TypeDef *Enable_Port;  // GPIO Port for Hall Sensor 1
+    GPIO_TypeDef *Enable_Port;  // GPIO Port for motor enable
     uint16_t Enable_Pin;
     DAC_HandleTypeDef *currentLimitDAC;
     uint16_t currentLimitDACChannel;
@@ -42,7 +42,8 @@ void RobotSystem_SetEnablePin(RobotSystem *robotSystem, bool onOrOff);
 void RobotSystem_SetLeftSpeed(RobotSystem *robotSystem, int16_t leftSpeed);
 void RobotSystem_SetRightSpeed(RobotSystem *robotSystem, int16_t rightSpeed);
 void RobotSystem_Stop(RobotSystem *robotSystem);
-
+void RobotSystem_GetMotorPosition(RobotSystem *robotSystem, int16_t *leftPos, int16_t *rightPos);
+void RobotSystem_GetMotorSpeed(RobotSystem *robotSystem, int16_t *leftSpeed, int16_t *rightSpeed);
 void RobotSystem_SetCurrentLimit(RobotSystem *robotSystem, uint16_t currentLimit);
 
 //void RobotSystem_InterruptHandler(RobotSystem *robotSystem, uint16_t GPIO_Pin);

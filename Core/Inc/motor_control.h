@@ -29,6 +29,8 @@
 
 #define SPEED_CALC_HALL_TO_REV (HALL_STATES * COMMUTATION_SEQ_PER_REV * GEARBOX_RATIO/ RPM_INPUT_DIVISOR)
 
+#define HALL_TICKS_PER_REV (HALL_STATES * COMMUTATION_SEQ_PER_REV * GEARBOX_RATIO)
+
 #define MAX_MOTOR_SPEED MAX_MOTOR_RPM
 #define MIN_MOTOR_SPEED MIN_MOTOR_RPM
 
@@ -76,7 +78,7 @@ typedef struct {
     uint16_t phaseChannel[3];
     uint8_t commutationOrder[6];
     uint8_t hallState;
-    int32_t distnace;
+    int16_t distance;
     bool isDirInverted;
     bool direction;
     int64_t target_speed; //final target speed
@@ -93,12 +95,15 @@ void Motor_SetPwm(Motor *motor, int16_t duty_cycle);
 void Motor_Stop(Motor *motor);
 void Motor_Update(Motor *motor);
 void Motor_Calculate(Motor *motor);
+void Motor_GetDistance(Motor *motor, int16_t *distance);
+void Motor_GetSpeed(Motor *motor, int16_t *speed);
 
 void SetPhases(Motor *motor, uint8_t highPhase, uint8_t lowPhase, bool direction);
 void SetPhase(Motor *motor, uint8_t phase,  bool OnorOff, bool HighOrLow);
 
 void ReadHallSensors(Motor *motor);
 void CalculateHallTiming(Motor *motor);
+void CalculateDistance(Motor *motor);
 
 
 #endif /* INC_MOTOR_CONTROL_H_ */

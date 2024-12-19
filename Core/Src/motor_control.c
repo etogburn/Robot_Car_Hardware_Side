@@ -43,8 +43,8 @@ void Motor_SetSpeed(Motor *motor, int64_t target_speed) {
 	if (target_speed > -MIN_MOTOR_SPEED && target_speed < MIN_MOTOR_SPEED)
 			target_speed = 0;
 
-	motor->pid.integral = 0;
-	motor->pid.previousError = 0;
+	//motor->pid.integral = 0;
+	//motor->pid.previousError = 0;
 
 	motor->target_speed = target_speed;
 
@@ -84,6 +84,7 @@ void Motor_Calculate(Motor *motor) {
 	// Update PID every certain time cycle
 	if ((currentTime - motor->pid.lastUpdateTime) >= PID_CALC_TIMING) {
 
+		CalculateDistance(motor);
 		if(motor->pid.set_speed > motor->target_speed) {
 			if(motor->pid.set_speed > 0 && motor->pid.set_speed - motor->acceleration < 0 && motor->target_speed < 0) {
 				if(motor->current_speed > motor->pid.set_speed + motor->acceleration) {
@@ -269,4 +270,17 @@ void CalculateHallTiming(Motor *motor) {
 	if(motor->direction) motor->pid.hallCount++;
 	else motor->pid.hallCount--;
 }
+
+void CalculateDistance(Motor *motor) {
+	motor->distance = (int16_t)(motor->pid.hallCount * RPM_INPUT_DIVISOR / HALL_TICKS_PER_REV);
+}
+
+void Motor_GetDistance(Motor *motor, int16_t *distance) {
+	*distance = motor->distance;
+}
+
+void Motor_GetSpeed(Motor *motor, int16_t *speed) {
+	*speed = motor->current_speed;
+}
+
 

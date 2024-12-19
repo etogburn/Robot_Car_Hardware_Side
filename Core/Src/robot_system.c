@@ -44,6 +44,16 @@ void RobotSystem_Stop(RobotSystem *robotSystem) {
     Motor_Stop(&robotSystem->rightWheel);
 }
 
+void RobotSystem_GetMotorPosition(RobotSystem *robotSystem, int16_t *leftPos, int16_t *rightPos) {
+	Motor_GetDistance(&robotSystem->leftWheel, leftPos);
+	Motor_GetDistance(&robotSystem->rightWheel, rightPos);
+}
+
+void RobotSystem_GetMotorSpeed(RobotSystem *robotSystem, int16_t *leftSpeed, int16_t *rightSpeed) {
+	Motor_GetSpeed(&robotSystem->leftWheel, leftSpeed);
+	Motor_GetSpeed(&robotSystem->rightWheel, rightSpeed);
+}
+
 void RobotSystem_Calculate(RobotSystem *robotSystem) {
 	Motor_Calculate(&robotSystem->leftWheel);
 	Motor_Calculate(&robotSystem->rightWheel);
