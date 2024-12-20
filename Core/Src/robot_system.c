@@ -8,6 +8,7 @@
 #include "robot_system.h"
 
 // Initialize the robot system with configurations for the left and right motors
+
 void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig) {
     // Copy configurations into the robot system
     robotSystem->leftWheel = leftMotorConfig;
@@ -26,16 +27,22 @@ void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rig
 
 // Set the speeds of the left and right motors
 void RobotSystem_SetSpeed(RobotSystem *robotSystem, int16_t leftSpeed, int16_t rightSpeed) {
-    Motor_SetSpeed(&robotSystem->leftWheel, leftSpeed);
-    Motor_SetSpeed(&robotSystem->rightWheel, rightSpeed);
+	if(robotSystem->motorsEnabled) {
+		Motor_SetSpeed(&robotSystem->leftWheel, leftSpeed);
+		Motor_SetSpeed(&robotSystem->rightWheel, rightSpeed);
+	}
 }
 
 void RobotSystem_SetLeftSpeed(RobotSystem *robotSystem, int16_t leftSpeed) {
-	Motor_SetSpeed(&robotSystem->leftWheel, leftSpeed);
+	if(robotSystem->motorsEnabled) {
+		Motor_SetSpeed(&robotSystem->leftWheel, leftSpeed);
+	}
 }
 
 void RobotSystem_SetRightSpeed(RobotSystem *robotSystem, int16_t rightSpeed) {
-	Motor_SetSpeed(&robotSystem->rightWheel, rightSpeed);
+	if(robotSystem->motorsEnabled) {
+		Motor_SetSpeed(&robotSystem->rightWheel, rightSpeed);
+	}
 }
 
 // Stop both motors in the robot system
@@ -57,6 +64,7 @@ void RobotSystem_GetMotorSpeed(RobotSystem *robotSystem, int16_t *leftSpeed, int
 void RobotSystem_Calculate(RobotSystem *robotSystem) {
 	Motor_Calculate(&robotSystem->leftWheel);
 	Motor_Calculate(&robotSystem->rightWheel);
+	RobotSystem_WheelFaultHandler(robotSystem);
 }
 
 void RobotSystem_InterruptHandler(RobotSystem *robotSystem, TIM_HandleTypeDef *htim) {
@@ -70,19 +78,26 @@ void RobotSystem_InterruptHandler(RobotSystem *robotSystem, TIM_HandleTypeDef *h
 }
 
 void RobotSystem_Enable (RobotSystem *robotSystem) {
+	robotSystem->motorsEnabled = true;
 	RobotSystem_SetEnablePin(robotSystem, true);
+	HAL_Delay(20);
 }
 
 void RobotSystem_Disable (RobotSystem *robotSystem) {
+	robotSystem->motorsEnabled = false;
+	RobotSystem_Stop(robotSystem);
 	RobotSystem_SetEnablePin(robotSystem, false);
+
+	HAL_Delay(20);
 }
 
 void RobotSystem_SetEnablePin(RobotSystem *robotSystem, bool onOrOff) {
-	bool setValue = true;
+	bool setValue = 0;
 	if(onOrOff) setValue = true;
 	else setValue = false;
 
 	HAL_GPIO_WritePin(robotSystem->Enable_Port, robotSystem->Enable_Pin, setValue);
+	//__HAL_TIM_SET_COMPARE(robotSystem->FaultTimer, TIM_CHANNEL_1, setValue);
 }
 
 void RobotSystem_SetCurrentLimit(RobotSystem *robotSystem, uint16_t currentLimit) {
@@ -95,5 +110,29 @@ void RobotSystem_SetCurrentLimit(RobotSystem *robotSystem, uint16_t currentLimit
 	uint32_t dac_value = 4095 * voltage / 3300; // Convert voltage to digital value
 	HAL_DAC_SetValue(robotSystem->currentLimitDAC, robotSystem->currentLimitDACChannel, DAC_ALIGN_12B_R, dac_value);
 	HAL_Delay(25);
+}
+
+void RobotSystem_WheelFaultHandler(RobotSystem *robotSystem) {
+	if(Motor_GetFaultStatus(&robotSystem->leftWheel)) {
+		RobotSystem_ResetEnablePin(robotSystem);
+		//RobotSystem_SetLeftSpeed(robotSystem, 0);
+	}
+
+	if(Motor_GetFaultStatus(&robotSystem->rightWheel)) {
+		RobotSystem_ResetEnablePin(robotSystem);
+		//RobotSystem_SetRightSpeed(robotSystem, 0);
+	}
+}
+
+void RobotSystem_ResetEnablePin(RobotSystem *robotSystem) {
+	if(robotSystem->motorsEnabled) {
+		RobotSystem_SetEnablePin(robotSystem, false);
+
+		for(uint16_t i = 0; i < 10; i++) {
+
+		}
+		// Optional: Stop the timer if you want to halt further operation
+		RobotSystem_SetEnablePin(robotSystem, true);
+	}
 }
 

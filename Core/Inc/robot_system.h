@@ -20,7 +20,7 @@
 #define RESISTOR2 75 //kohms * 10
 #define RESISTORS (RESISTOR1+RESISTOR2)
 
-#define MAX_CURRENT_LIMIT 10
+#define MAX_CURRENT_LIMIT 5
 
 // Define the RobotSystem structure
 typedef struct {
@@ -31,6 +31,7 @@ typedef struct {
     DAC_HandleTypeDef *currentLimitDAC;
     uint16_t currentLimitDACChannel;
     uint16_t currentLimit;
+    bool motorsEnabled;
 } RobotSystem;
 
 // Robot system functions
@@ -45,6 +46,8 @@ void RobotSystem_Stop(RobotSystem *robotSystem);
 void RobotSystem_GetMotorPosition(RobotSystem *robotSystem, int16_t *leftPos, int16_t *rightPos);
 void RobotSystem_GetMotorSpeed(RobotSystem *robotSystem, int16_t *leftSpeed, int16_t *rightSpeed);
 void RobotSystem_SetCurrentLimit(RobotSystem *robotSystem, uint16_t currentLimit);
+void RobotSystem_WheelFaultHandler(RobotSystem *robotSystem);
+void RobotSystem_ResetEnablePin(RobotSystem *robotSystem);
 
 //void RobotSystem_InterruptHandler(RobotSystem *robotSystem, uint16_t GPIO_Pin);
 void RobotSystem_InterruptHandler(RobotSystem *robotSystem, TIM_HandleTypeDef *htim);

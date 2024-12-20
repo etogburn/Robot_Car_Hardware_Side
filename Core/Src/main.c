@@ -17,7 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <motor_control.h>
 #include "main.h"
 #include "adc.h"
 #include "dac.h"
@@ -74,6 +73,8 @@ Motor rightWheel = {
 		.Hall1_Channel = TIM_CHANNEL_1,
 		.Hall2_Channel = TIM_CHANNEL_2,
 		.Hall3_Channel = TIM_CHANNEL_3,
+		.Fault_Port = nLMC_CURRFAULT_GPIO_Port,
+		.Fault_Pin = nLMC_CURRFAULT_Pin,
 		.Hall1_Port = LMC_HALL1_GPIO_Port,  // GPIO Port for Hall Sensor 1
 		.Hall1_Pin = LMC_HALL1_Pin,       // GPIO Pin for Hall Sensor 1
 		.Hall2_Port = LMC_HALL2_GPIO_Port,  // GPIO Port for Hall Sensor 2
@@ -97,6 +98,8 @@ Motor leftWheel = {
 		.Hall1_Channel = TIM_CHANNEL_1,
 		.Hall2_Channel = TIM_CHANNEL_2,
 		.Hall3_Channel = TIM_CHANNEL_3,
+		.Fault_Port = nRMC_CURRFAULT_GPIO_Port,
+		.Fault_Pin = nRMC_CURRFAULT_Pin,
 		.Hall1_Port = RMC_HALL1_GPIO_Port,  // GPIO Port for Hall Sensor 1
 		.Hall1_Pin = RMC_HALL1_Pin,       // GPIO Pin for Hall Sensor 1
 		.Hall2_Port = RMC_HALL2_GPIO_Port,  // GPIO Port for Hall Sensor 2

@@ -23,6 +23,8 @@ void Motor_Init(Motor *motor) {
 	motor->pid.pwmVal = 0;
 	motor->pid.filterGain = DER_FILTER_GAIN;
 	motor->pid.maxIntegral = MAX_INTEGRAL_VAL;
+	motor->isFault = false;
+	motor->faultRecovery = false;
 
 
 	HAL_TIM_IC_Start_IT(motor->HallTimer, motor->Hall1_Channel);
@@ -80,10 +82,16 @@ void Motor_Stop(Motor *motor) {
 
 void Motor_Calculate(Motor *motor) {
 	uint32_t currentTime = HAL_GetTick(); // Get the current time in milliseconds
+	if(Motor_GetFaultStatus(motor)) {
 
+	}
 	// Update PID every certain time cycle
 	if ((currentTime - motor->pid.lastUpdateTime) >= PID_CALC_TIMING) {
 
+		if(motor->faultRecovery) {
+			Motor_CurrFaultHandler(motor);
+			return;
+		}
 		CalculateDistance(motor);
 		if(motor->pid.set_speed > motor->target_speed) {
 			if(motor->pid.set_speed > 0 && motor->pid.set_speed - motor->acceleration < 0 && motor->target_speed < 0) {
@@ -281,6 +289,19 @@ void Motor_GetDistance(Motor *motor, int16_t *distance) {
 
 void Motor_GetSpeed(Motor *motor, int16_t *speed) {
 	*speed = motor->current_speed;
+}
+
+bool Motor_GetFaultStatus(Motor *motor) {
+	motor->isFault = !HAL_GPIO_ReadPin(motor->Fault_Port, motor->Fault_Pin);
+	if(motor->isFault) motor->faultRecovery = true;
+	return motor->isFault;
+}
+
+void Motor_CurrFaultHandler(Motor *motor) {
+	if(motor->faultRecovery) {
+		//do some stuff. right now. going to just reset and continue normally.
+		motor->faultRecovery = false;
+	}
 }
 
 

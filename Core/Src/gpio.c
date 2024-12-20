@@ -69,7 +69,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOG, MCM_KILL_Pin|nCAN_STBY_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(nWHEEL_MOTOR_SHDN_GPIO_Port, nWHEEL_MOTOR_SHDN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(nWHEEL_MOTOR_SHDN_GPIO_Port, nWHEEL_MOTOR_SHDN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PAPin PAPin */
   GPIO_InitStruct.Pin = nAUX2_EN_Pin|LED_A_INT_Pin;

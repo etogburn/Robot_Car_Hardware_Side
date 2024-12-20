@@ -96,7 +96,12 @@ void CommandHandler_ProcessCommand(ComsInterface_t *interface, RobotSystem *robo
 
 void Handle_SetMotorEnable(DecodedPacket_t *packet, RobotSystem *robot) {
 	uint8_t data = packet->data[0] > 0 ? 1 : 0;
-	RobotSystem_SetEnablePin(robot, data);
+
+	if(data) {
+		RobotSystem_Enable(robot);
+	} else {
+		RobotSystem_Disable(robot);
+	}
 
 	Response_OK();
 }

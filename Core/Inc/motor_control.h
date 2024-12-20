@@ -65,7 +65,7 @@ typedef struct {
 	uint16_t Hall1_Channel;
 	uint16_t Hall2_Channel;
 	uint16_t Hall3_Channel;
-	GPIO_TypeDef *Fault_Port;  // GPIO Port for Hall Sensor 1
+	GPIO_TypeDef *Fault_Port;  // GPIO Port for current fault
 	uint16_t Fault_Pin;
     GPIO_TypeDef *Hall1_Port;  // GPIO Port for Hall Sensor 1
     uint16_t Hall1_Pin;        // GPIO Pin for Hall Sensor 1
@@ -81,6 +81,8 @@ typedef struct {
     int16_t distance;
     bool isDirInverted;
     bool direction;
+    bool isFault;
+    bool faultRecovery;
     int64_t target_speed; //final target speed
     int64_t current_speed;
 	int64_t acceleration;     //rpm change per pid loop
@@ -97,6 +99,8 @@ void Motor_Update(Motor *motor);
 void Motor_Calculate(Motor *motor);
 void Motor_GetDistance(Motor *motor, int16_t *distance);
 void Motor_GetSpeed(Motor *motor, int16_t *speed);
+bool Motor_GetFaultStatus(Motor *motor);
+void Motor_CurrFaultHandler(Motor *motor);
 
 void SetPhases(Motor *motor, uint8_t highPhase, uint8_t lowPhase, bool direction);
 void SetPhase(Motor *motor, uint8_t phase,  bool OnorOff, bool HighOrLow);
