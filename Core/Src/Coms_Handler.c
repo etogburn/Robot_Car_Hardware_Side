@@ -47,6 +47,7 @@ static void ComsHandler_BufToPacket(DecodedPacket_t *packet, void *buf) {
 	memset(packet->data, 0, MAX_DATA_SIZE);
 
 	packet->invalid = false;
+	packet->isNew = true;
 
     if (buffer->data[0] != START_BYTE) {
     	packet->invalid = true; // Invalid start byte, discard packet
@@ -230,6 +231,7 @@ void Comm_Init(ComsInterface_t *instance, CommType type, void *config)
 
     for(uint8_t i = 0; i < FIFO_SIZE; i++) {
     	instance->rxPacket[i].invalid = true;
+    	instance->rxPacket[i].isNew = false;
     }
 
     if (type == COMM_UART) {
@@ -266,25 +268,43 @@ HAL_StatusTypeDef Comm_Receive(ComsInterface_t *instance, uint8_t *data, uint16_
 }
 
 void Comm_Process(ComsInterface_t *instance) {
+	static uint32_t currentTime;
+	static uint32_t lastTime;
+
+	currentTime = HAL_GetTick();
+
+	if(instance->type == COMM_UART) {
+		if(currentTime - lastTime > 1000) {
+			UART_SetupReceive(instance);
+			lastTime = currentTime;
+		}
+	}
 
 	while (instance->decodeIdx != instance->rxIdx) {
 		instance->interface.ConvertToPacket(&instance->rxPacket[instance->decodeIdx], &instance->rxBuf[instance->decodeIdx]);
 		Coms_IncIdx(&instance->decodeIdx);
+		lastTime = currentTime;
 	}
 }
 
 DecodedPacket_t Comm_GetPacket(ComsInterface_t *instance) {
-	DecodedPacket_t invalidPacket = {
-			.invalid = true
+	DecodedPacket_t packet = {
+			.invalid = true,
+			.isNew = false
 	};
+
 	if(instance->decodeIdx == instance->processIdx) {
-		return invalidPacket;
+		return packet;
 	}
+
 	uint8_t idx = instance->processIdx;
 
 	Coms_IncIdx(&instance->processIdx);
+	memcpy(&packet, &instance->rxPacket[idx], sizeof(instance->rxPacket[idx]));
 
-	return instance->rxPacket[idx];
+	instance->rxPacket[idx].isNew = false;
+
+	return packet;
 }
 
 

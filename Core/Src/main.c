@@ -70,7 +70,7 @@ RobotSystem robot = {
 		.currentLimitDACChannel = DAC_CHANNEL_1
 };
 
-Motor leftWheel = {
+Motor rightWheel = {
 		.Hall1_Channel = TIM_CHANNEL_1,
 		.Hall2_Channel = TIM_CHANNEL_2,
 		.Hall3_Channel = TIM_CHANNEL_3,
@@ -85,15 +85,15 @@ Motor leftWheel = {
 		.phaseChannel = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3},
 		.commutationOrder = {6,2,3,1,5,4}, //011, 010, 110, 100, 101, 001
 		.hallState = 0,
-		.isDirInverted = false,
+		.isDirInverted = true,
 		.direction = true,
-		.acceleration = MAX_MOTOR_RPM/10, //rpm change per pid loop
+		.acceleration = MAX_MOTOR_RPM/4, //rpm change per pid loop
 		.pid.Kp = 150,
 		.pid.Ki = 500,
 		.pid.Kd = 10
 };
 
-Motor rightWheel = {
+Motor leftWheel = {
 		.Hall1_Channel = TIM_CHANNEL_1,
 		.Hall2_Channel = TIM_CHANNEL_2,
 		.Hall3_Channel = TIM_CHANNEL_3,
@@ -110,7 +110,7 @@ Motor rightWheel = {
 		.hallState = 0,
 		.isDirInverted = false,
 		.direction = true,
-		.acceleration = MAX_MOTOR_RPM/10, //rpm change per pid loop
+		.acceleration = MAX_MOTOR_RPM/4, //rpm change per pid loop
 		.pid.Kp = 150,
 		.pid.Ki = 500,
 		.pid.Kd = 10
@@ -185,7 +185,13 @@ int main(void)
   IMU_Init(&imu);
   RobotSystem_Init(&robot, leftWheel, rightWheel);
   Comm_Init(&serial, COMM_UART, &huart2);
-
+  HAL_Delay(250);
+  DecodedPacket_t readyPacket = {
+		  .command = COMMAND_READY,
+		  .length = 0,
+		  .invalid = false
+  };
+  Comm_Send(&serial, &readyPacket);
   /* USER CODE END 2 */
 
   /* Infinite loop */

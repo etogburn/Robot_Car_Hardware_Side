@@ -15,8 +15,8 @@
 
 #define DMA_UART_HANDLE &hdma_usart2_rx
 
-//#ifdef HAS_USB_COMMS
-#define CANSPI
+//#define HAS_USB_COMMS
+//#define CANSPI
 //#define FDCAN
 
 #define START_BYTE 0xAA
@@ -44,6 +44,7 @@ typedef struct {
     uint8_t data[MAX_DATA_SIZE];   // data bytes
     uint8_t length; //length of data bytes
     bool invalid;
+    bool isNew;
 } DecodedPacket_t;
 
 typedef struct {

@@ -29,11 +29,15 @@ static void SendResponse(ComsInterface_t *interface) {
 }
 
 static void SetResponse(uint16_t command, uint8_t length, uint8_t *data) {
+	if(data == NULL) {
+		response.length = 0;
+	} else {
+		response.length = sizeof(data);
+		memset(response.data, 0, MAX_DATA_SIZE);
+		memcpy(response.data, data, response.length);
+	}
 	response.invalid = false;
 	response.command = command;
-	response.length = sizeof(*data);
-	memset(response.data, 0, MAX_DATA_SIZE);
-	memcpy(response.data, data, sizeof(*data));
 }
 
 static void Response_OK() {
@@ -49,9 +53,9 @@ static int16_t makeInt16_t(uint8_t *val1, uint8_t *val2) {
 }
 
 static void int16_tToUint8_t(int16_t *input, uint8_t *output) {
-	if(sizeof(*input) != sizeof(*output)) return;
+	if(sizeof(input) != sizeof(output)) return;
 	
-	uint8_t maxLoop = sizeof(*input)/2;
+	uint8_t maxLoop = sizeof(input)/2;
 
 	for(uint8_t i = 0; i < maxLoop; i++) {
 		output[2*i] = (input[i] & 0xFF00) >> 8;
@@ -68,6 +72,8 @@ void CommandHandler_Init(void) {
 void CommandHandler_ProcessCommand(ComsInterface_t *interface, RobotSystem *robot) {
     // Check for NULL pointer
 	DecodedPacket_t packet = Comm_GetPacket(interface);
+
+	if(!packet.isNew) return;
 
 	if(packet.invalid) {
 		Response_Invalid();
