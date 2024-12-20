@@ -48,6 +48,18 @@ static int16_t makeInt16_t(uint8_t *val1, uint8_t *val2) {
 	return (*val1 << 8) | *val2;
 }
 
+static void int16_tToUint8_t(int16_t *input, uint8_t *output) {
+	if(sizeof(*input) != sizeof(*output)) return;
+	
+	uint8_t maxLoop = sizeof(*input)/2;
+
+	for(uint8_t i = 0; i < maxLoop; i++) {
+		output[2*i] = (input[i] & 0xFF00) >> 8;
+		output[2*i+1] = input[i] & 0xFF;
+	}
+
+}
+
 void CommandHandler_Init(void) {
     // Initialize any peripherals or variables related to command handling
     // Example: GPIO, Timers, etc.
@@ -65,7 +77,11 @@ void CommandHandler_ProcessCommand(ComsInterface_t *interface, RobotSystem *robo
 
 	for (int i = 0; i < sizeof(commandTable) / sizeof(CommandTableEntry_t); i++) {
 		if (commandTable[i].commandID == packet.command) {
-			commandTable[i].handler(&packet, robot);
+			if(commandTable[i].expLength == 0 || commandTable[i].expLength == packet.length) {
+				commandTable[i].handler(&packet, robot);
+			} else {
+				Response_Invalid();
+			}
 			SendResponse(interface);
 			return;
 		}
@@ -73,22 +89,13 @@ void CommandHandler_ProcessCommand(ComsInterface_t *interface, RobotSystem *robo
 }
 
 void Handle_SetMotorEnable(DecodedPacket_t *packet, RobotSystem *robot) {
-	if(packet->length != 1) {
-		Response_Invalid();
-		return;
-	}
-
 	uint8_t data = packet->data[0] > 0 ? 1 : 0;
 	RobotSystem_SetEnablePin(robot, data);
+
+	Response_OK();
 }
 
 void Handle_SetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot) {
-
-	if(packet->length != 4) {
-		Response_Invalid();
-		return;
-	}
-
 	int16_t leftSpeed = makeInt16_t(&packet->data[0], &packet->data[1]);
 	int16_t rightSpeed = makeInt16_t(&packet->data[2], &packet->data[3]);
 	RobotSystem_SetSpeed(robot, leftSpeed, rightSpeed);
@@ -103,48 +110,37 @@ void Handle_SetMotorStop(DecodedPacket_t *packet, RobotSystem *robot) {
 }
 
 void Handle_SetOneMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot) {
-
-	if(packet->length != 2) {
-		Response_Invalid();
-		return;
-	}
-
 	int16_t speed = makeInt16_t(&packet->data[0], &packet->data[1]);
 
-	if(packet->command == 0x0103) {
+	if(packet->command == COMMAND_SETLEFTSPEED) {
 		RobotSystem_SetLeftSpeed(robot, speed);
-	} else if(packet->command == 0x0104) {
+	} else if(packet->command == COMMAND_SETRIGHTSPEED) {
 		RobotSystem_SetRightSpeed(robot, speed);
 	}
+
+	Response_OK();
 }
 
 void Handle_GetMotorPosition(DecodedPacket_t *packet, RobotSystem *robot) {
-	int16_t leftPos;
-	int16_t rightPos;
-	RobotSystem_GetMotorPosition(robot, &leftPos, &rightPos);
-
+	int16_t wheelPos[2];
 	uint8_t data[4];
 
-	data[0] = leftPos >> 8;
-	data[1] = leftPos & 0xFF;
-	data[2] = rightPos >> 8;
-	data[3] = rightPos & 0xFF;
+	RobotSystem_GetMotorPosition(robot, &wheelPos[0], &wheelPos[1]);
 
-	SetResponse(0x0180, sizeof(data), data);
+	int16_tToUint8_t(wheelPos, data);
+
+	SetResponse(COMMAND_GETMOTORPOSITION, sizeof(data), data);
 }
 
 void Handle_GetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot) {
-	int16_t leftSpeed;
-	int16_t rightSpeed;
-	RobotSystem_GetMotorSpeed(robot, &leftSpeed, &rightSpeed);
-
+	int16_t speed[2];
 	uint8_t data[4];
-	data[0] = leftSpeed >> 8;
-	data[1] = leftSpeed & 0xFF;
-	data[2] = rightSpeed >> 8;
-	data[3] = rightSpeed & 0xFF;
 
-	SetResponse(0x0180, sizeof(data), data);
+	RobotSystem_GetMotorSpeed(robot, &speed[0], &speed[1]);
+
+	int16_tToUint8_t(speed, data);
+
+	SetResponse(COMMAND_GETMOTORSPEED, sizeof(data), data);
 }
 
 void Handle_WakeUp(DecodedPacket_t *packet, RobotSystem *robot) {
