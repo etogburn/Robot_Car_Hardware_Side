@@ -120,6 +120,7 @@ Motor leftWheel = {
 };
 
 ComsInterface_t serial;
+ComsInterface_t canbus;
 DecodedPacket_t input;
 DecodedPacket_t response;
 
@@ -139,7 +140,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 
 /* USER CODE END 0 */
 
@@ -188,6 +188,7 @@ int main(void)
   IMU_Init(&imu);
   RobotSystem_Init(&robot, leftWheel, rightWheel);
   Comm_Init(&serial, COMM_UART, &huart2);
+  Comm_Init(&canbus, COMM_CAN, &hfdcan1);
   HAL_Delay(250);
   DecodedPacket_t readyPacket = {
 		  .command = COMMAND_READY,
@@ -195,6 +196,15 @@ int main(void)
 		  .invalid = false
   };
   Comm_Send(&serial, &readyPacket);
+
+  HAL_GPIO_WritePin(nCAN_STBY_GPIO_Port, nCAN_STBY_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(CAN_EN_5V_GPIO_Port, CAN_EN_5V_Pin, GPIO_PIN_SET);
+
+  readyPacket.length = 2;
+  readyPacket.data[0] = 0xAA;
+  readyPacket.data[1] = 0xCC;
+  uint32_t currentTime = 0;
+  uint32_t lastTime = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -209,6 +219,11 @@ int main(void)
 
 	  CommandHandler_ProcessCommand(&serial, &robot);
 
+	  currentTime = HAL_GetTick();
+	  if(currentTime - lastTime > 250) {
+		  HAL_StatusTypeDef state = Comm_Send(&canbus, &readyPacket);
+		  lastTime = currentTime;
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -280,20 +295,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
-//  if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET)
-//  {
-//    /* Retreive Rx messages from RX FIFO0 */
-//    if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
-//    {
-//    /* Reception Error */
-//    Error_Handler();
-//    }
-//    if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-//    {
-//      /* Notification Error */
-//      Error_Handler();
-//    }
-//  }
+	if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != 0)
+	{
+		Comm_Receive(&canbus, 0, 0);
+	}
 }
 
 /* USER CODE END 4 */

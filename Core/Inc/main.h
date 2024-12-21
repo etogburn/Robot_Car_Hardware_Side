@@ -115,6 +115,8 @@ void Error_Handler(void);
 #define PWM_CL_LMC_GPIO_Port GPIOC
 #define MCM_KILL_Pin GPIO_PIN_7
 #define MCM_KILL_GPIO_Port GPIOG
+#define CAN_EN_5V_Pin GPIO_PIN_8
+#define CAN_EN_5V_GPIO_Port GPIOG
 #define nCAN_STBY_Pin GPIO_PIN_9
 #define nCAN_STBY_GPIO_Port GPIOG
 #define nLMC_CURRFAULT_Pin GPIO_PIN_2

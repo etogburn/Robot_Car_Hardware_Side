@@ -165,17 +165,14 @@ static HAL_StatusTypeDef CAN_Send(void *config, DecodedPacket_t *packet)
 {
 
 #ifdef FDCAN
+
     FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)config;
 
-    if (length < 5 || data[1] > 8 || length != (5 + data[1])) {
-        return HAL_ERROR;  // Invalid DLC or data length
-    }
-
     FDCAN_TxHeaderTypeDef txHeader;
-    txHeader.Identifier = (data[2] << 8) | data[3];  // Use bytes 3 and 4 as header
-    txHeader.IdType = FDCAN_STANDARD_ID;
+    txHeader.Identifier = packet->command;  //send command as packet ID
+    txHeader.IdType = FDCAN_EXTENDED_ID;
     txHeader.TxFrameType = FDCAN_DATA_FRAME;
-    txHeader.DataLength = (data[1] << 16);  // DLC in byte 2
+    txHeader.DataLength = packet->length;
     txHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
     txHeader.BitRateSwitch = FDCAN_BRS_OFF;
     txHeader.FDFormat = FDCAN_CLASSIC_CAN;
@@ -183,7 +180,7 @@ static HAL_StatusTypeDef CAN_Send(void *config, DecodedPacket_t *packet)
     txHeader.MessageMarker = 0;
 
     // Only include data bytes 5 to N-1
-    return HAL_FDCAN_AddMessageToTxFifoQ(hfdcan, &txHeader, &data[4]);
+    return HAL_FDCAN_AddMessageToTxFifoQ(hfdcan, &txHeader, packet->data);
 #endif
 
 	return HAL_OK;
@@ -191,32 +188,46 @@ static HAL_StatusTypeDef CAN_Send(void *config, DecodedPacket_t *packet)
 
 // CAN Receive Function
 //going to be handled in an interrupt as with the all receive functions
-static HAL_StatusTypeDef CAN_Receive(void *config, uint8_t *data, uint16_t length)
+static HAL_StatusTypeDef CAN_Receive(void *inst, uint8_t *data, uint16_t length)
 {
 
 #ifdef FDCAN
-    FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)config;
+	ComsInterface_t *instance = (ComsInterface_t *)inst;
+    FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)instance->config;
     FDCAN_RxHeaderTypeDef rxHeader;
-    uint8_t canData[8];
+    uint8_t RxData[8];
 
-    if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &rxHeader, canData) != HAL_OK) {
-        return HAL_ERROR;
-    }
+	// Check if a new message is available
 
-    uint8_t dlc = (rxHeader.DataLength >> 16) & 0xF;
-    if (length < (5 + dlc)) {
-        return HAL_ERROR;  // Ensure buffer is large enough
-    }
+		// Retrieve the message from the FIFO
+		if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &rxHeader, RxData) == HAL_OK)
+		{
+			// Process the received message
+			instance->rxPacket[instance->processIdx].invalid = false;
+			instance->rxPacket[instance->processIdx].isNew = true;
+			instance->rxPacket[instance->processIdx].length = rxHeader.DataLength & 0xFF;
+			memset(instance->rxPacket[instance->processIdx].data, 0, MAX_DATA_SIZE);
+			memcpy(instance->rxPacket[instance->processIdx].data, RxData, MAX_DATA_SIZE);
 
-    // Populate received data in the specified format
-    data[0] = 0;                 // Reserved for future use
-    data[1] = dlc;               // DLC
-    data[2] = (rxHeader.Identifier >> 8) & 0xFF; // Header byte 1
-    data[3] = rxHeader.Identifier & 0xFF;       // Header byte 2
-    for (uint8_t i = 0; i < dlc; i++) {
-        data[4 + i] = canData[i];
-    }
+			Coms_IncIdx(&instance->rxIdx);
+			Coms_IncIdx(&instance->processIdx);
+		}
+		else
+		{
+
+		}
+
 #endif
+    return HAL_OK;
+}
+
+static HAL_StatusTypeDef CAN_SetupReceive(void *inst)
+{
+	ComsInterface_t *instance = (ComsInterface_t *)inst;
+	FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)instance->config;
+
+	HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
+
     return HAL_OK;
 }
 
@@ -250,6 +261,9 @@ void Comm_Init(ComsInterface_t *instance, CommType type, void *config)
     else if (type == COMM_CAN) {
         instance->interface.Send = CAN_Send;
         instance->interface.Receive = CAN_Receive;
+        FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)config;
+        HAL_FDCAN_Start(hfdcan);
+        CAN_SetupReceive(hfdcan);
     }
 }
 

@@ -66,7 +66,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(nCS_MCM_GYRO_SPI_GPIO_Port, nCS_MCM_GYRO_SPI_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, MCM_KILL_Pin|nCAN_STBY_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, MCM_KILL_Pin|CAN_EN_5V_Pin|nCAN_STBY_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(nWHEEL_MOTOR_SHDN_GPIO_Port, nWHEEL_MOTOR_SHDN_Pin, GPIO_PIN_RESET);
@@ -110,8 +110,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(ACC_INT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PGPin PGPin PGPin */
-  GPIO_InitStruct.Pin = nCS_MCM_GYRO_SPI_Pin|MCM_KILL_Pin|nCAN_STBY_Pin;
+  /*Configure GPIO pins : PGPin PGPin PGPin PGPin */
+  GPIO_InitStruct.Pin = nCS_MCM_GYRO_SPI_Pin|MCM_KILL_Pin|CAN_EN_5V_Pin|nCAN_STBY_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

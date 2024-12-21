@@ -17,7 +17,7 @@
 
 //#define HAS_USB_COMMS
 //#define CANSPI
-//#define FDCAN
+#define FDCAN
 
 #define START_BYTE 0xAA
 #define MAX_DATA_SIZE 8 //bytes
