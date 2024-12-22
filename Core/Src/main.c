@@ -185,10 +185,13 @@ int main(void)
   MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_GPIO_WritePin(nCAN_STBY_GPIO_Port, nCAN_STBY_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(CAN_EN_5V_GPIO_Port, CAN_EN_5V_Pin, GPIO_PIN_SET);
+
   IMU_Init(&imu);
   RobotSystem_Init(&robot, leftWheel, rightWheel);
   Comm_Init(&serial, COMM_UART, &huart2);
-  Comm_Init(&canbus, COMM_CAN, &hfdcan1);
+  //Comm_Init(&canbus, COMM_CAN, &hfdcan1);
   HAL_Delay(250);
   DecodedPacket_t readyPacket = {
 		  .command = COMMAND_READY,
@@ -197,14 +200,13 @@ int main(void)
   };
   Comm_Send(&serial, &readyPacket);
 
-  HAL_GPIO_WritePin(nCAN_STBY_GPIO_Port, nCAN_STBY_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(CAN_EN_5V_GPIO_Port, CAN_EN_5V_Pin, GPIO_PIN_SET);
+
 
   readyPacket.length = 2;
   readyPacket.data[0] = 0xAA;
   readyPacket.data[1] = 0xCC;
-  uint32_t currentTime = 0;
-  uint32_t lastTime = 0;
+//  uint32_t currentTime = 0;
+//  uint32_t lastTime = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -219,11 +221,11 @@ int main(void)
 
 	  CommandHandler_ProcessCommand(&serial, &robot);
 
-	  currentTime = HAL_GetTick();
-	  if(currentTime - lastTime > 250) {
-		  HAL_StatusTypeDef state = Comm_Send(&canbus, &readyPacket);
-		  lastTime = currentTime;
-	  }
+//	  currentTime = HAL_GetTick();
+//	  if(currentTime - lastTime > 250) {
+//		  HAL_StatusTypeDef state = Comm_Send(&canbus, &readyPacket);
+//		  lastTime = currentTime;
+//	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -252,8 +254,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
-  RCC_OscInitStruct.PLL.PLLN = 85;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
+  RCC_OscInitStruct.PLL.PLLN = 20;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;

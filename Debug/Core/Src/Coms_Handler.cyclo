@@ -8,7 +8,7 @@
 ../Core/Src/Coms_Handler.c:191:26:CAN_Receive	2
 ../Core/Src/Coms_Handler.c:224:26:CAN_SetupReceive	1
 ../Core/Src/Coms_Handler.c:235:6:Comm_Init	4
-../Core/Src/Coms_Handler.c:271:19:Comm_Send	2
-../Core/Src/Coms_Handler.c:279:19:Comm_Receive	1
-../Core/Src/Coms_Handler.c:284:6:Comm_Process	4
-../Core/Src/Coms_Handler.c:304:17:Comm_GetPacket	2
+../Core/Src/Coms_Handler.c:273:19:Comm_Send	2
+../Core/Src/Coms_Handler.c:281:19:Comm_Receive	1
+../Core/Src/Coms_Handler.c:286:6:Comm_Process	4
+../Core/Src/Coms_Handler.c:306:17:Comm_GetPacket	2

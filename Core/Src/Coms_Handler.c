@@ -226,8 +226,8 @@ static HAL_StatusTypeDef CAN_SetupReceive(void *inst)
 	ComsInterface_t *instance = (ComsInterface_t *)inst;
 	FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)instance->config;
 
-	HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
-
+	HAL_StatusTypeDef status = HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
+//	uint32_t b = HAL_FDCAN_GetError(hfdcan);
     return HAL_OK;
 }
 
@@ -261,9 +261,11 @@ void Comm_Init(ComsInterface_t *instance, CommType type, void *config)
     else if (type == COMM_CAN) {
         instance->interface.Send = CAN_Send;
         instance->interface.Receive = CAN_Receive;
+
         FDCAN_HandleTypeDef *hfdcan = (FDCAN_HandleTypeDef *)config;
-        HAL_FDCAN_Start(hfdcan);
+
         CAN_SetupReceive(hfdcan);
+
     }
 }
 
