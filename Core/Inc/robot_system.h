@@ -9,8 +9,10 @@
 #define INC_ROBOT_SYSTEM_H_
 
 #include <stdbool.h>
+#include <string.h>
 #include "main.h"
 #include "motor_control.h" // Include the motor control header for Motor structure
+#include "IMU.h"
 #include "stm32g4xx_hal.h"
 //#include "serial_commands.h"
 
@@ -26,6 +28,7 @@
 typedef struct {
     Motor leftWheel;  // Left wheel motor
     Motor rightWheel; // Right wheel motor
+    IMU_HandleTypeDef imu;
     GPIO_TypeDef *Enable_Port;  // GPIO Port for motor enable
     uint16_t Enable_Pin;
     DAC_HandleTypeDef *currentLimitDAC;
@@ -35,7 +38,7 @@ typedef struct {
 } RobotSystem;
 
 // Robot system functions
-void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig);
+void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig, IMU_HandleTypeDef imuConfig);
 void RobotSystem_SetSpeed(RobotSystem *robotSystem, int16_t leftSpeed, int16_t rightSpeed);
 void RobotSystem_Enable (RobotSystem *robotSystem);
 void RobotSystem_Disable (RobotSystem *robotSystem);
@@ -48,6 +51,10 @@ void RobotSystem_GetMotorSpeed(RobotSystem *robotSystem, int16_t *leftSpeed, int
 void RobotSystem_SetCurrentLimit(RobotSystem *robotSystem, uint16_t currentLimit);
 void RobotSystem_WheelFaultHandler(RobotSystem *robotSystem);
 void RobotSystem_ResetEnablePin(RobotSystem *robotSystem);
+void RobotSystem_ImuInterruptHandler(RobotSystem *robotSystem, uint16_t GPIO_Pin);
+void RobotSystem_GetAccelVals(RobotSystem *robotSystem, int16_t *accel);
+void RobotSystem_GetGyroVals(RobotSystem *robotSystem, int16_t *gyro);
+void RobotSystem_GetTempVals(RobotSystem *robotSystem, int16_t *temp);
 
 //void RobotSystem_InterruptHandler(RobotSystem *robotSystem, uint16_t GPIO_Pin);
 void RobotSystem_InterruptHandler(RobotSystem *robotSystem, TIM_HandleTypeDef *htim);

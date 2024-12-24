@@ -9,16 +9,18 @@
 
 // Initialize the robot system with configurations for the left and right motors
 
-void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig) {
+void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig, IMU_HandleTypeDef imuConfig) {
     // Copy configurations into the robot system
     robotSystem->leftWheel = leftMotorConfig;
     robotSystem->rightWheel = rightMotorConfig;
+    robotSystem->imu = imuConfig;
 
     HAL_DAC_Start(robotSystem->currentLimitDAC, robotSystem->currentLimitDACChannel);
 
     RobotSystem_SetCurrentLimit(robotSystem, MAX_CURRENT_LIMIT);
 
     // Initialize the left and right motors
+    IMU_Init(&robotSystem->imu);
     Motor_Init(&robotSystem->leftWheel);
     Motor_Init(&robotSystem->rightWheel);
 
@@ -136,3 +138,29 @@ void RobotSystem_ResetEnablePin(RobotSystem *robotSystem) {
 	}
 }
 
+void RobotSystem_ImuInterruptHandler(RobotSystem *robotSystem, uint16_t GPIO_Pin) {
+	IMU_InterruptHandler(&robotSystem->imu, GPIO_Pin);
+}
+
+void RobotSystem_GetAccelVals(RobotSystem *robotSystem, int16_t *accel) {
+	//if(sizeof(accel)/sizeof(accel[0]) != 3) return;
+	accel[0] = robotSystem->imu.accel[0];
+	accel[1] = robotSystem->imu.accel[1];
+	accel[2] = robotSystem->imu.accel[2];
+	//memcpy(accel, robotSystem->imu.accel, sizeof(robotSystem->imu.accel));
+
+}
+
+void RobotSystem_GetGyroVals(RobotSystem *robotSystem, int16_t *gyro) {
+	//if(sizeof(gyro)/sizeof(gyro[0]) != 3) return;
+
+	gyro[0] = robotSystem->imu.gyro[0];
+	gyro[1] = robotSystem->imu.gyro[1];
+	gyro[2] = robotSystem->imu.gyro[2];
+
+	//memcpy(gyro, robotSystem->imu.gyro, sizeof(robotSystem->imu.gyro));
+}
+
+void RobotSystem_GetTempVals(RobotSystem *robotSystem, int16_t *temp) {
+	*temp = robotSystem->imu.temperature;
+}

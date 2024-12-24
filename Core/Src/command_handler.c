@@ -19,7 +19,9 @@ CommandTableEntry_t commandTable[] = {
 		COMMAND_0x0103,
 		COMMAND_0x0104,
 		COMMAND_0x0180,
-		COMMAND_0x0181
+		COMMAND_0x0181,
+		COMMAND_0x0201,
+		COMMAND_0x0210
 };
 
 // Function to initialize the Command Handler
@@ -32,7 +34,7 @@ static void SetResponse(uint16_t command, uint8_t length, uint8_t *data) {
 	if(data == NULL) {
 		response.length = 0;
 	} else {
-		response.length = sizeof(data);
+		response.length = length;
 		memset(response.data, 0, MAX_DATA_SIZE);
 		memcpy(response.data, data, response.length);
 	}
@@ -52,16 +54,13 @@ static int16_t makeInt16_t(uint8_t *val1, uint8_t *val2) {
 	return (*val1 << 8) | *val2;
 }
 
-static void int16_tToUint8_t(int16_t *input, uint8_t *output) {
-	if(sizeof(input) != sizeof(output)) return;
-	
-	uint8_t maxLoop = sizeof(input)/2;
+static void int16_tToUint8_t(int16_t *input, uint8_t *output, uint8_t num) {
+	uint8_t maxLoop = num;
 
 	for(uint8_t i = 0; i < maxLoop; i++) {
 		output[2*i] = (input[i] & 0xFF00) >> 8;
 		output[2*i+1] = input[i] & 0xFF;
 	}
-
 }
 
 void CommandHandler_Init(void) {
@@ -138,9 +137,9 @@ void Handle_GetMotorPosition(DecodedPacket_t *packet, RobotSystem *robot) {
 
 	RobotSystem_GetMotorPosition(robot, &wheelPos[0], &wheelPos[1]);
 
-	int16_tToUint8_t(wheelPos, data);
+	int16_tToUint8_t(wheelPos, data, 2);
 
-	SetResponse(COMMAND_GETMOTORPOSITION, sizeof(data), data);
+	SetResponse(COMMAND_GETMOTORPOSITION, 4, data);
 }
 
 void Handle_GetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot) {
@@ -149,9 +148,9 @@ void Handle_GetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot) {
 
 	RobotSystem_GetMotorSpeed(robot, &speed[0], &speed[1]);
 
-	int16_tToUint8_t(speed, data);
+	int16_tToUint8_t(speed, data, 2);
 
-	SetResponse(COMMAND_GETMOTORSPEED, sizeof(data), data);
+	SetResponse(COMMAND_GETMOTORSPEED, 4, data);
 }
 
 void Handle_WakeUp(DecodedPacket_t *packet, RobotSystem *robot) {
@@ -166,48 +165,25 @@ void Handle_Shutdown(DecodedPacket_t *packet, RobotSystem *robot) {
 	Response_OK();
 }
 
-// Function to process a received command
-// void CommandHandler_ProcessCommand(ComsInterface_t *interface, RobotSystem *robot) {
-//     // Check for NULL pointer
-// 	DecodedPacket_t command = Comm_GetPacket(interface);
+void Handle_GetAccelVals(DecodedPacket_t *packet, RobotSystem *robot) {
+	int16_t accel[3];
+	uint8_t data[6];
 
+	RobotSystem_GetAccelVals(robot, accel);
 
-//     int16_t value = (command.data[0] << 8) | command.data[1];
+	int16_tToUint8_t(accel, data, 3);
 
+	SetResponse(COMMAND_GETACCELVALS, 6, data);
+}
 
-//     if (!command.invalid) {
-//     	// Handle the command based on the command ID
-// 		switch (command.command) {
+void Handle_GetGyroVals(DecodedPacket_t *packet, RobotSystem *robot) {
+	int16_t gyro[3];
+	uint8_t data[6];
 
-// 			case 0x0001: // Example: Motor 1 Speed
-// 				{
-// 					SetResponse(COMMAND_READY, 0xFFFF);
-// 					Comm_Send(interface, &response);
-// 				}
-// 				break;
-// 			case 0x0101: // Example: Motor 1 Speed
-// 				{
-// 					DriveSystem_SetLeftSpeed(robot, value);
-// 				}
-// 				break;
+	RobotSystem_GetGyroVals(robot, gyro);
 
-// 			case 0x0102: // Example: Motor 2 Speed
-// 				{
-// 					DriveSystem_SetRightSpeed(robot, value);
-// 				}
-// 				break;
+	int16_tToUint8_t(gyro, data, 3);
 
-// 			case 0x0103: // Example: Enable Motor Blade
-// 				{
-// 					DriveSystem_Stop(robot);
-// 				}
-// 				break;
-
-// 			default: // Unknown command
-// 				// Handle invalid or unrecognized commands
-// 				break;
-// 		}
-//     }
-// }
-
+	SetResponse(COMMAND_GETGYROVALS, 6, data);
+}
 

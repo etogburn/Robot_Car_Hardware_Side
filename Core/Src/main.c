@@ -188,8 +188,7 @@ int main(void)
   HAL_GPIO_WritePin(nCAN_STBY_GPIO_Port, nCAN_STBY_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CAN_EN_5V_GPIO_Port, CAN_EN_5V_Pin, GPIO_PIN_SET);
 
-  IMU_Init(&imu);
-  RobotSystem_Init(&robot, leftWheel, rightWheel);
+  RobotSystem_Init(&robot, leftWheel, rightWheel, imu);
   Comm_Init(&serial, COMM_UART, &huart2);
   //Comm_Init(&canbus, COMM_CAN, &hfdcan1);
   HAL_Delay(250);
@@ -287,7 +286,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	IMU_InterruptHandler(&imu, GPIO_Pin);
+	RobotSystem_ImuInterruptHandler(&robot, GPIO_Pin);
 
 }
 

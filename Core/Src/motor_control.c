@@ -280,7 +280,7 @@ void CalculateHallTiming(Motor *motor) {
 }
 
 void CalculateDistance(Motor *motor) {
-	motor->distance = (int16_t)(motor->pid.hallCount * RPM_INPUT_DIVISOR / HALL_TICKS_PER_REV);
+	motor->distance = (int16_t)(motor->pid.hallCount & 0xFFFF); // * RPM_INPUT_DIVISOR / HALL_TICKS_PER_REV);
 }
 
 void Motor_GetDistance(Motor *motor, int16_t *distance) {

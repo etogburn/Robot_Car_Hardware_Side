@@ -27,6 +27,8 @@
 #define COMMAND_MOTORSTOP 0x0102
 #define COMMAND_GETMOTORSPEED 0x0180
 #define COMMAND_GETMOTORPOSITION 0x0181
+#define COMMAND_GETACCELVALS 0x0201
+#define COMMAND_GETGYROVALS 0x0210
 
 typedef void (*CommandFunction_t)(DecodedPacket_t *packet, RobotSystem *robot);
 
@@ -46,6 +48,8 @@ typedef struct {
 #define COMMAND_0x0104 {COMMAND_SETRIGHTSPEED, 2, Handle_SetOneMotorSpeed} //set right motor speed
 #define COMMAND_0x0180 {COMMAND_GETMOTORSPEED, 0, Handle_GetMotorSpeed}
 #define COMMAND_0x0181 {COMMAND_GETMOTORPOSITION, 0, Handle_GetMotorPosition}
+#define COMMAND_0x0201 {COMMAND_GETACCELVALS, 0, Handle_GetAccelVals}
+#define COMMAND_0x0210 {COMMAND_GETGYROVALS, 0, Handle_GetGyroVals}
 
 
 void Handle_WakeUp(DecodedPacket_t *packet, RobotSystem *robot);
@@ -57,6 +61,8 @@ void Handle_SetOneMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot);
 void Handle_SetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot);
 void Handle_GetMotorPosition(DecodedPacket_t *packet, RobotSystem *robot);
 void Handle_GetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot);
+void Handle_GetAccelVals(DecodedPacket_t *packet, RobotSystem *robot);
+void Handle_GetGyroVals(DecodedPacket_t *packet, RobotSystem *robot);
 
 // Function prototypes
 void CommandHandler_Init(void);
