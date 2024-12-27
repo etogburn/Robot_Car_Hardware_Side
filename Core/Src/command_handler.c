@@ -13,6 +13,7 @@ CommandTableEntry_t commandTable[] = {
 		COMMAND_0x0000,
 		COMMAND_0x0001,
 		COMMAND_0x0002,
+		COMMAND_0x0080,
 		COMMAND_0x0100,
 		COMMAND_0x0101,
 		COMMAND_0x0102,
@@ -79,6 +80,8 @@ void CommandHandler_ProcessCommand(ComsInterface_t *interface, RobotSystem *robo
 		SendResponse(interface);
 		return;
 	}
+
+	RobotSystem_ResetWatchdog(robot);
 
 	for (int i = 0; i < sizeof(commandTable) / sizeof(CommandTableEntry_t); i++) {
 		if (commandTable[i].commandID == packet.command) {
@@ -162,6 +165,7 @@ void Handle_Ready(DecodedPacket_t *packet, RobotSystem *robot) {
 }
 
 void Handle_Shutdown(DecodedPacket_t *packet, RobotSystem *robot) {
+	RobotSystem_Shutdown(robot);
 	Response_OK();
 }
 
@@ -185,5 +189,16 @@ void Handle_GetGyroVals(DecodedPacket_t *packet, RobotSystem *robot) {
 	int16_tToUint8_t(gyro, data, 3);
 
 	SetResponse(COMMAND_GETGYROVALS, 6, data);
+}
+
+void Handle_GetBatVolt(DecodedPacket_t *packet, RobotSystem *robot) {
+	uint16_t batVolt;
+	uint8_t data[2];
+
+	RobotSystem_GetBatVolt(robot, &batVolt);
+
+	data[0] = batVolt >> 8;
+	data[1] = batVolt & 0xFF;
+	SetResponse(COMMAND_GETBATVOLT, 2, data);
 }
 

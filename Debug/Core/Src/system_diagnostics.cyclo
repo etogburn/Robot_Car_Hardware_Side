@@ -1,0 +1,5 @@
+../Core/Src/system_diagnostics.c:10:6:SysDiag_Init	1
+../Core/Src/system_diagnostics.c:14:6:SysDiag_SleepWatchdog	3
+../Core/Src/system_diagnostics.c:26:6:SysDiag_Kill	1
+../Core/Src/system_diagnostics.c:32:6:SysDiag_ResetWatchDog	1
+../Core/Src/system_diagnostics.c:36:6:SysDiag_GetBatVoltage	1

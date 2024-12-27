@@ -9,15 +9,18 @@
 
 // Initialize the robot system with configurations for the left and right motors
 
-void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig, IMU_HandleTypeDef imuConfig) {
+void RobotSystem_Init(RobotSystem *robotSystem, Motor leftMotorConfig, Motor rightMotorConfig, IMU_HandleTypeDef imuConfig, SystemDiagnostics_t sysConfig) {
     // Copy configurations into the robot system
     robotSystem->leftWheel = leftMotorConfig;
     robotSystem->rightWheel = rightMotorConfig;
     robotSystem->imu = imuConfig;
+    robotSystem->sys = sysConfig;
 
     HAL_DAC_Start(robotSystem->currentLimitDAC, robotSystem->currentLimitDACChannel);
 
     RobotSystem_SetCurrentLimit(robotSystem, MAX_CURRENT_LIMIT);
+
+    SysDiag_Init(&robotSystem->sys);
 
     // Initialize the left and right motors
     IMU_Init(&robotSystem->imu);
@@ -64,6 +67,7 @@ void RobotSystem_GetMotorSpeed(RobotSystem *robotSystem, int16_t *leftSpeed, int
 }
 
 void RobotSystem_Calculate(RobotSystem *robotSystem) {
+	SysDiag_SleepWatchdog(&robotSystem->sys);
 	Motor_Calculate(&robotSystem->leftWheel);
 	Motor_Calculate(&robotSystem->rightWheel);
 	RobotSystem_WheelFaultHandler(robotSystem);
@@ -163,4 +167,16 @@ void RobotSystem_GetGyroVals(RobotSystem *robotSystem, int16_t *gyro) {
 
 void RobotSystem_GetTempVals(RobotSystem *robotSystem, int16_t *temp) {
 	*temp = robotSystem->imu.temperature;
+}
+
+void RobotSystem_ResetWatchdog(RobotSystem *robotSystem) {
+	SysDiag_ResetWatchDog(&robotSystem->sys);
+}
+
+void RobotSystem_GetBatVolt(RobotSystem *robotSystem, uint16_t *batVolt) {
+	SysDiag_GetBatVoltage(&robotSystem->sys, batVolt);
+}
+
+void RobotSystem_Shutdown(RobotSystem *robotSystem) {
+	SysDiag_Kill(&robotSystem->sys);
 }

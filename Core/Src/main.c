@@ -29,6 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "system_diagnostics.h"
 #include "Coms_Handler.h"
 #include "IMU.h"
 #include "command_handler.h"
@@ -54,6 +55,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+SystemDiagnostics_t sys = {
+		.Mcm_Kill_Port = MCM_KILL_GPIO_Port,  // GPIO Port for current fault
+		.Mcm_Kill_Pin = MCM_KILL_Pin,
+		.batAdc = &hadc3,
+		.batAdcChannel = ADC_CHANNEL_7,
+		.sleepTimeout = 0
+};
 IMU_HandleTypeDef imu = {
 	    .hspi = &hspi1,      // SPI handle
 	    .cs_port = nCS_MCM_GYRO_SPI_GPIO_Port,        // GPIO port for CS pin
@@ -188,7 +197,7 @@ int main(void)
   HAL_GPIO_WritePin(nCAN_STBY_GPIO_Port, nCAN_STBY_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(CAN_EN_5V_GPIO_Port, CAN_EN_5V_Pin, GPIO_PIN_SET);
 
-  RobotSystem_Init(&robot, leftWheel, rightWheel, imu);
+  RobotSystem_Init(&robot, leftWheel, rightWheel, imu, sys);
   Comm_Init(&serial, COMM_UART, &huart2);
   //Comm_Init(&canbus, COMM_CAN, &hfdcan1);
   HAL_Delay(250);

@@ -20,6 +20,7 @@
 #define COMMAND_READY 0x0001
 #define COMMAND_WAKE 0x0000
 #define COMMAND_SHUTDOWN 0x0002
+#define COMMAND_GETBATVOLT 0x0080
 #define COMMAND_MOTORENABLE 0x0100
 #define COMMAND_SETMOTORSPEED 0x0101
 #define COMMAND_SETLEFTSPEED 0x0103
@@ -41,6 +42,7 @@ typedef struct {
 #define COMMAND_0x0000 {COMMAND_WAKE, 0, Handle_WakeUp}
 #define COMMAND_0x0001 {COMMAND_READY, 0, Handle_Ready}
 #define COMMAND_0x0002 {COMMAND_SHUTDOWN, 0, Handle_Shutdown}
+#define COMMAND_0x0080 {COMMAND_GETBATVOLT, 0, Handle_GetBatVolt}
 #define COMMAND_0x0100 {COMMAND_MOTORENABLE, 1, Handle_SetMotorEnable}
 #define COMMAND_0x0101 {COMMAND_SETMOTORSPEED, 4, Handle_SetMotorSpeed} //set both motors speed
 #define COMMAND_0x0102 {COMMAND_MOTORSTOP, 0, Handle_SetMotorStop} //stop both motors
@@ -63,6 +65,7 @@ void Handle_GetMotorPosition(DecodedPacket_t *packet, RobotSystem *robot);
 void Handle_GetMotorSpeed(DecodedPacket_t *packet, RobotSystem *robot);
 void Handle_GetAccelVals(DecodedPacket_t *packet, RobotSystem *robot);
 void Handle_GetGyroVals(DecodedPacket_t *packet, RobotSystem *robot);
+void Handle_GetBatVolt(DecodedPacket_t *packet, RobotSystem *robot);
 
 // Function prototypes
 void CommandHandler_Init(void);
